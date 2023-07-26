@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ConstructionGuard::Middleware
+    puts "========================= Method called=================="
   def initialize(app)
     @app = app
   end
