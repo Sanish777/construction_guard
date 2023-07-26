@@ -11,6 +11,10 @@ module ConstructionGuard::Middleware
     @app.call(env)
   end
 
+  def connection
+    "-------------Connection Established-------------"
+  end
+
   private
 
   def under_construction?
