@@ -1,0 +1,53 @@
+AllCops:
+  TargetRubyVersion: 3.0.2
+  Exclude:
+    - "bin/**/*"
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Lint/AmbiguousBlockAssociation:
+  Exclude: ["spec/**/*"] # Rspec syntax is sweetest with a side of "ambiguous block association"
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  ExcludedMethods: ["describe", "context", "rails_admin", "factory", "define", "namespace", "shared_examples", "shared_contexts"]
+  CountAsOne: ['array', 'hash']
+
+Metrics/ClassLength:
+  Max: 120
+  CountAsOne: ['array', 'hash']
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 14
+  CountAsOne: ['array', 'hash']
+
+Naming/MemoizedInstanceVariableName:
+  EnforcedStyleForLeadingUnderscores: required
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/DocumentationMethod:
+  Enabled: true
+  RequireForNonPublicMethods: true
+  Exclude: ['spec/**/*']
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+  Exclude:
+    - 'Gemfile'
+
+Style/SymbolArray:
+  MinSize: 4
