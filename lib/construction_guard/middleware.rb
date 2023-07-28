@@ -1,7 +1,6 @@
-# frozen_string_literal: true
-
-module ConstructionGuard::Middleware
-  class << self
+# lib/construction_guard/middleware.rb
+module ConstructionGuard
+  class Middleware
     def initialize(app)
       @app = app
     end
