@@ -1,0 +1,13 @@
+<%= stylesheet_link_tag 'construction_guard.css' %>
+
+<%= form_for(:session, url: login_path) do |f| %>
+  <div class="form-group">
+    <%= f.label :email %>
+    <%= f.email_field :email, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :password %>
+    <%= f.password_field :password, class: "form-control" %>
+  </div>
+  <%= f.submit "Log In", class: "btn btn-primary" %>
+<% end %>
