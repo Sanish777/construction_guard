@@ -1,8 +1,13 @@
 # lib/construction_guard/middleware.rb
 module ConstructionGuard
   class Middleware
-    def initialize(app)
+    attr_accessor :under_construction, :maintenance_message
+
+    def initialize(app, options = {})
       @app = app
+
+      @under_construction = options.fetch(:under_construction, false)
+      @maintenance_message = options.fetch(:maintenance_message, "This site is currently under maintenance. Please check back later.")
     end
 
     def call(env)
@@ -16,7 +21,7 @@ module ConstructionGuard
       # For simplicity, you can use an environment variable or a configuration setting
       # to toggle the under construction state.
       # Example:
-      true
+      under_construction
     end
 
     def under_construction_response
@@ -30,7 +35,7 @@ module ConstructionGuard
           </head>
           <body>
             <h1>Under Construction</h1>
-            <p>This website is currently under construction. Please check back later.</p>
+            <p>#{maintenance_message}</p>
           </body>
         </html>
       HTML

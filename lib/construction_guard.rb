@@ -2,6 +2,7 @@
 
 require_relative "construction_guard/version"
 require "construction_guard/middleware"
+require "construction_guard/configuration"
 
 module ConstructionGuard
   class Error < StandardError; end
