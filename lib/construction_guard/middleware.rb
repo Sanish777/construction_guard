@@ -30,22 +30,7 @@ module ConstructionGuard
     def under_construction_response
       # The HTML content for the "Under Construction" page.
       # You can customize this page as you like.
-      <<~HTML
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Under Construction</title>
-          </head>
-          <body>
-            <h1>Under Construction</h1>
-            <p>#{maintenance_message}</p>
-            <form action="/" method="GET"> <!-- Replace "/" with the correct URL to unlock the site -->
-              <input type="text" name="unlock" placeholder="Enter unlock password">
-              <button type="submit">Unlock</button>
-            </form>
-          </body>
-        </html>
-      HTML
+      ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message)
     end
   end
 end
