@@ -5,22 +5,25 @@ module ConstructionGuard
 
     def initialize(app, options = {})
       @app = app
-
-      @under_construction = options.fetch(:under_construction, false)
-      @maintenance_message = options.fetch(:maintenance_message, "This site is currently under maintenance. Please check back later.")
+      @under_construction = options.fetch(:under_construction, true) # Set default to true (under construction)
+      @maintenance_message = options.fetch(:maintenance_message,
+                                           "This site is currently under maintenance. Please check back later.")
     end
 
     def call(env)
-      return [200, { 'Content-Type' => 'text/html' }, [under_construction_response]] if under_construction?
+      request = Rack::Request.new(env)
+
+      if request.get? && under_construction? && request.params["unlock"] == "secret_password"
+        @under_construction = false # Disable under construction if the correct unlock password is provided
+        return [302, {"Location" => request.url}, []] # Redirect to the same page after unlocking
+      end
+
+      return [200, {"Content-Type" => "text/html"}, [under_construction_response]] if under_construction?
 
       @app.call(env)
     end
 
     def under_construction?
-      # Implement your logic here to check if the application is under construction
-      # For simplicity, you can use an environment variable or a configuration setting
-      # to toggle the under construction state.
-      # Example:
       under_construction
     end
 
@@ -36,6 +39,10 @@ module ConstructionGuard
           <body>
             <h1>Under Construction</h1>
             <p>#{maintenance_message}</p>
+            <form action="/" method="GET"> <!-- Replace "/" with the correct URL to unlock the site -->
+              <input type="text" name="unlock" placeholder="Enter unlock password">
+              <button type="submit">Unlock</button>
+            </form>
           </body>
         </html>
       HTML
