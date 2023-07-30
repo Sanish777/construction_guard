@@ -6,9 +6,12 @@
   <body>
     <h1>Under Construction</h1>
     <p><%= message %></p>
-    <form action="/" method="GET"> <!-- Replace "/" with the correct URL to unlock the site -->
-      <input type="text" name="unlock" placeholder="Enter unlock password">
-      <button type="submit">Unlock</button>
+    <form action="/unlock" method="post">
+      <label for="password">Unlock Password:</label>
+      <input type="password" id="password" name="unlock_password" required>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <input type="submit" value="Unlock">
     </form>
   </body>
 </html>

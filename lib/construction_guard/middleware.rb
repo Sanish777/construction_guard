@@ -13,15 +13,39 @@ module ConstructionGuard
     def call(env)
       request = Rack::Request.new(env)
 
-      if request.get? && under_construction? && request.params["unlock"] == "secret_password"
-        @under_construction = false # Disable under construction if the correct unlock password is provided
-        return [302, {"Location" => request.url}, []] # Redirect to the same page after unlocking
+      # Check if the user is already unlocked (cookie set)
+      if request.cookies["unlocked"] == "true"
+        # The user is already unlocked, proceed with the request
+        return @app.call(env)
       end
 
-      return [200, {"Content-Type" => "text/html"}, [under_construction_response]] if under_construction?
+      if request.post? && request.path == "/unlock"
+        # Handle the unlock form submission via POST
+        unlock_password = request.params["unlock_password"]
+        email = request.params["email"]
 
+        if under_construction? && email_matched?(email) && unlock_password == ENV["CONSTRUCTION_PASSWORD"]
+          # Set a cookie to indicate the user is unlocked
+          response = Rack::Response.new
+          response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
+          response.redirect("/") # Redirect to the homepage or any other page you desire
+          return response.finish
+        else
+          # Show an error message or redirect to an error page if unlock is unsuccessful
+          # ...
+        end
+      end
+
+      if under_construction?
+        # Show the "under construction" page if the user is not unlocked
+        return [200, {"Content-Type" => "text/html"}, [under_construction_response]]
+      end
+
+      # Proceed with the request if the "under construction" mode is not active
       @app.call(env)
     end
+
+    private
 
     def under_construction?
       under_construction
@@ -31,6 +55,20 @@ module ConstructionGuard
       # The HTML content for the "Under Construction" page.
       # You can customize this page as you like.
       ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message)
+    end
+
+    def emails
+      # Access the configuration file from the Rails application
+      config_file = Rails.root.join("config", "underconstruction_guard.yml")
+      config_data = YAML.load_file(config_file) if File.exist?(config_file)
+
+      # Retrieve the 'emails' key from the config data
+      config_data["emails"] || []
+    end
+
+    def email_matched?(email_to_check)
+      allowed_emails = emails
+      allowed_emails.include?(email_to_check)
     end
   end
 end
