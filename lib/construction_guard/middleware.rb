@@ -1,4 +1,7 @@
 # lib/construction_guard/middleware.rb
+
+require "google/apis/groupssettings_v1"
+require "googleauth"
 module ConstructionGuard
   class Middleware
     attr_accessor :under_construction, :maintenance_message
@@ -24,7 +27,7 @@ module ConstructionGuard
         unlock_password = request.params["unlock_password"]
         email = request.params["email"]
 
-        if under_construction? && email_matched?(email) && unlock_password == ENV["CONSTRUCTION_PASSWORD"]
+        if under_construction? && email_matched?(email, fetch_allowed_emails)
           # Set a cookie to indicate the user is unlocked
           response = Rack::Response.new
           response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
@@ -57,18 +60,31 @@ module ConstructionGuard
       ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message)
     end
 
-    def emails
-      # Access the configuration file from the Rails application
-      config_file = Rails.root.join("config", "underconstruction_guard.yml")
-      config_data = YAML.load_file(config_file) if File.exist?(config_file)
+    def fetch_allowed_emails
+      # Use the Google Groups API to fetch allowed emails
+      group_email = "your-group@example.com" # Replace with your actual group email
+      group_settings = Google::Apis::GroupssettingsV1::GroupssettingsService.new
+      group_settings.authorization = authorizer # Make sure to set up authorization as in the previous examples
 
-      # Retrieve the 'emails' key from the config data
-      config_data["emails"] || []
+      begin
+        group_settings.get_groups_settings(group_email).who_can_post_message_moderation
+      rescue StandardError => e
+        # Handle API errors or log them
+        puts "Error fetching allowed emails: #{e.message}"
+        []
+      end
     end
 
-    def email_matched?(email_to_check)
-      allowed_emails = emails
+    def email_matched?(email_to_check, allowed_emails)
       allowed_emails.include?(email_to_check)
+    end
+
+    def authorizer
+      # Create an OAuth2 service account authorizer from the environment variables
+      Google::Auth::ServiceAccountCredentials.make_creds(
+        json_key_io: StringIO.new(ENV["GOOGLE_API_CREDENTIALS_JSON"]),
+        scope: Google::Apis::GroupssettingsV1::AUTH_APPS_GROUPS_SETTINGS
+      )
     end
   end
 end
