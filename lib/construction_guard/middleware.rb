@@ -1,4 +1,6 @@
 # lib/construction_guard/middleware.rb
+require_relative "github_authentication/github_app_auth"
+
 module ConstructionGuard
   class Middleware
     attr_accessor :under_construction, :maintenance_message
@@ -12,6 +14,7 @@ module ConstructionGuard
 
     def call(env)
       request = Rack::Request.new(env)
+
 
       # Check if the user is already unlocked (cookie set)
       if request.cookies["unlocked"] == "true"
@@ -30,9 +33,29 @@ module ConstructionGuard
           response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
           response.redirect("/") # Redirect to the homepage or any other page you desire
           return response.finish
+
         else
           # Show an error message or redirect to an error page if unlock is unsuccessful
           # ...
+        end
+      end
+
+      if request.get? && request.path == "/github_login"
+        access_token = GithubAuthentication::GithubAppAuth.login
+        user_details = GithubAuthentication::GithubAppAuth.retrieve_user_details(access_token)
+        is_member = GithubAuthentication::GithubAppAuth.retrieve_organization_membership(user_details["login"],
+                                                                                         access_token)
+        # 204 status code, if requester is an organization member and user is a member
+        # 302 status code, if requester is not an organization member
+        # 404 status code, Not Found if requester is an organization member and user is not a member
+        if is_member.code.to_i == 204
+          # Set a cookie to indicate the user is unlocked
+          response = Rack::Response.new
+          response.set_cookie("unlocked",
+                              value: "true",
+                              expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
+          response.redirect("/") # Redirect to the homepage or any other page you desire
+          return response.finish
         end
       end
 
