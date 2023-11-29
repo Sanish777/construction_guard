@@ -1,4 +1,8 @@
 # lib/construction_guard/middleware.rb
+
+require "net/http"
+CLIENT_ID = "abc"
+
 module ConstructionGuard
   class Middleware
     attr_accessor :under_construction, :maintenance_message
@@ -12,31 +16,30 @@ module ConstructionGuard
 
     def call(env)
       request = Rack::Request.new(env)
-
       # Check if the user is already unlocked (cookie set)
-      if request.cookies["unlocked"] == "true"
+      if cookies["unlocked"] == "true"
         # The user is already unlocked, proceed with the request
         return @app.call(env)
       end
 
-      if request.post? && request.path == "/unlock"
-        # Handle the unlock form submission via POST
-        unlock_password = request.params["unlock_password"]
-        email = request.params["email"]
+      # if request.post? && request.path == "/unlock"
+      #   # Handle the unlock form submission via POST
+      #   unlock_password = request.params["unlock_password"]
+      #   email = request.params["email"]
 
-        if under_construction? && email_matched?(email) && unlock_password == ENV["CONSTRUCTION_PASSWORD"]
-          # Set a cookie to indicate the user is unlocked
-          response = Rack::Response.new
-          response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
-          response.redirect("/") # Redirect to the homepage or any other page you desire
-          return response.finish
-        else
-          # Show an error message or redirect to an error page if unlock is unsuccessful
-          # ...
-        end
-      end
+      #   if under_construction? && email_matched?(email) && unlock_password == ENV["CONSTRUCTION_PASSWORD"]
+      #     # Set a cookie to indicate the user is unlocked
+      #     # response = Rack::Response.new
+      #     # response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
+      #     # response.redirect("/") # Redirect to the homepage or any other page you desire
+      #     # return response.finish
+      #   else
+      #     # Show an error message or redirect to an error page if unlock is unsuccessful
+      #     # ...
+      #   end
+      # end
 
-      if under_construction?
+      if under_construction? && (request.get? && request.path != '/constructionguard/github/callback')
         # Show the "under construction" page if the user is not unlocked
         return [200, {"Content-Type" => "text/html"}, [under_construction_response]]
       end
