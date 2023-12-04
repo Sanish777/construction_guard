@@ -33,14 +33,6 @@ module ConstructionGuard
         name = user_info["name"]
 
         logger.info "Successfully authorized! Welcome, #{name} (#{handle})."
-        cookies[:unlocked] = {
-          value: 'true',
-          expires: Time.now + (7 * 24 * 60 * 60),
-          path: '/'
-        }
-        # set_cookie("unlocked", value:  "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
-        # response.redirect("/") # Redirect to the homepage or any other page you desire
-        # response.finish
       else
         logger.info "Authorized, but unable to exchange code #{code} for token."
       end
