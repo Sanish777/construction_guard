@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files += Dir["lib/**/*.*"]
   spec.add_dependency "rails", ">= 7.0.6"
+  spec.add_dependency "dotenv", "~> 2.1", ">= 2.1.1"
+  spec.add_dependency "rest-client", "~> 2.1"
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem

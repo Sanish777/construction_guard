@@ -1,7 +1,6 @@
 # lib/construction_guard/middleware.rb
 
 require "net/http"
-CLIENT_ID = "abc"
 
 module ConstructionGuard
   class Middleware
@@ -32,23 +31,33 @@ module ConstructionGuard
 
         if token_data.key?("access_token")
           token = token_data["access_token"]
+          user_details = ConstructionGuard::GithubOauth.retrieve_user_details(token)
+
+          is_member = ConstructionGuard::GithubOauth.retrieve_organization_membership(
+            user_details["login"], token
+          )
 
           user_info = user_info(token)
           name = user_info["name"]
 
-          response.set_cookie("user_data", {
-                                value: name,
-                                expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
-                                path: "/" # Set the appropriate path
-                              })
+          # 204 status code, if requester is an organization member and user is a member
+          # 302 status code, if requester is not an organization member
+          # 404 status code, Not Found if requester is an organization member and user is not a member
+          if is_member.code.to_i == 204
+            response.set_cookie("user_data", {
+                                  value: name,
+                                  expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
+                                  path: "/" # Set the appropriate path
+                                })
+            response.set_cookie("unlocked", {
+                                  value: "true",
+                                  expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
+                                  path: "/" # Set the appropriate path
+                                })
+          end
         else
           p "Authorized, but unable to exchange code #{code} for token."
         end
-        response.set_cookie("unlocked", {
-                              value: "true",
-                              expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
-                              path: "/" # Set the appropriate path
-                            })
       end
 
       # exchange_code
