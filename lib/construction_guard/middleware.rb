@@ -1,4 +1,7 @@
 # lib/construction_guard/middleware.rb
+
+require "net/http"
+
 module ConstructionGuard
   class Middleware
     attr_accessor :under_construction, :maintenance_message
@@ -12,37 +15,100 @@ module ConstructionGuard
 
     def call(env)
       request = Rack::Request.new(env)
-
-      # Check if the user is already unlocked (cookie set)
-      if request.cookies["unlocked"] == "true"
-        # The user is already unlocked, proceed with the request
-        return @app.call(env)
-      end
-
-      if request.post? && request.path == "/unlock"
-        # Handle the unlock form submission via POST
-        unlock_password = request.params["unlock_password"]
-        email = request.params["email"]
-
-        if under_construction? && email_matched?(email) && unlock_password == ENV["CONSTRUCTION_PASSWORD"]
-          # Set a cookie to indicate the user is unlocked
-          response = Rack::Response.new
-          response.set_cookie("unlocked", value: "true", expires: Time.now + (7 * 24 * 60 * 60)) # Set to expire after 1 week
-          response.redirect("/") # Redirect to the homepage or any other page you desire
-          return response.finish
-        else
-          # Show an error message or redirect to an error page if unlock is unsuccessful
-          # ...
-        end
-      end
-
-      if under_construction?
+      if under_construction? && (request.get? && request.path == "/") && request.cookies["unlocked"].nil?
         # Show the "under construction" page if the user is not unlocked
         return [200, {"Content-Type" => "text/html"}, [under_construction_response]]
       end
 
-      # Proceed with the request if the "under construction" mode is not active
       @app.call(env)
+    end
+
+    class << self
+      def setup_omniauth(_request = nil, response = nil, code = nil)
+        return unless code
+
+        token_data = exchange_code(code)
+
+        if token_data.key?("access_token")
+          token = token_data["access_token"]
+          user_details = ConstructionGuard::GithubOauth.retrieve_user_details(token)
+
+          is_member = ConstructionGuard::GithubOauth.retrieve_organization_membership(
+            user_details["login"], token
+          )
+
+          user_info = user_info(token)
+          name = user_info["name"]
+
+          # 204 status code, if requester is an organization member and user is a member
+          # 302 status code, if requester is not an organization member
+          # 404 status code, Not Found if requester is an organization member and user is not a member
+          if is_member.code.to_i == 204
+            response.set_cookie("user_data", {
+                                  value: name,
+                                  expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
+                                  path: "/" # Set the appropriate path
+                                })
+            response.set_cookie("unlocked", {
+                                  value: "true",
+                                  expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
+                                  path: "/" # Set the appropriate path
+                                })
+          end
+        else
+          p "Authorized, but unable to exchange code #{code} for token."
+        end
+      end
+
+      # exchange_code
+      def exchange_code(code)
+        params = {
+          "client_id" => CLIENT_ID,
+          "client_secret" => CLIENT_SECRET,
+          "code" => code
+        }
+
+        p "HELLO FROM SETUP OMNIAUTH #{params}"
+        result = Net::HTTP.post(
+          URI("https://github.com/login/oauth/access_token"),
+          URI.encode_www_form(params),
+          {"Accept" => "application/json"}
+        )
+
+        parse_response(result)
+      end
+
+      # user_info
+      def user_info(token)
+        uri = URI.parse("https://api.github.com/user")
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        auth = "Bearer #{token}"
+        headers = {
+          "Accept" => "application/json",
+          "Authorization" => auth,
+          "X-GitHub-Api-Version" => "2022-11-28"
+        }
+
+        request = Net::HTTP::Get.new(uri.request_uri, headers)
+        result = http.request(request)
+
+        parse_response(result)
+      end
+
+      # parse_response
+      def parse_response(response)
+        case response
+        when Net::HTTPOK
+          JSON.parse(response.body)
+        else
+          puts response
+          puts response.body
+          {}
+        end
+      end
     end
 
     private
