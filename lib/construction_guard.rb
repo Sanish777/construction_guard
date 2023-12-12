@@ -26,7 +26,7 @@ module ConstructionGuard
   # Your code goes here...
 
   class << self
-    def setup_omniauth(code, response)
+    def setup_omniauth(code, _response)
       token_data = exchange_code(code)
 
       if token_data.key?("access_token")
@@ -74,7 +74,6 @@ module ConstructionGuard
 
     # user_info
     def user_info(token)
-
       uri = URI.parse("https://api.github.com/user")
 
       http = Net::HTTP.new(uri.host, uri.port)
