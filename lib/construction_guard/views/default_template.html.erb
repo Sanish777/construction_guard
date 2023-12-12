@@ -91,6 +91,7 @@
     <div class="glass-container">
       <h1 style="text-align: center; margin-bottom: 20px;">Under Construction</h1>
       <p style="text-align: center;"><%= message %></p>
+      <p class="error"><%= login_message%></p>
       <form action="/unlock" method="post">
         <label for="password">Unlock Password:</label>
         <input type="password" id="password" name="unlock_password" required>
@@ -98,7 +99,7 @@
         <input type="email" id="email" name="email" required>
         <input type="submit" value="Unlock">
       </form>
-      <a href="https://github.com/login/oauth/authorize?client_id=045533abc2fed9818559" target="_top">sign </a>
+      <a href="https://github.com/login/oauth/authorize?client_id=<%= ENV["CLIENT_ID"] %>" target="_top">sign </a>
     </div>
   </body>
 </html>
