@@ -11,13 +11,19 @@ module ConstructionGuard
       @under_construction = options.fetch(:under_construction, true) # Set default to true (under construction)
       @maintenance_message = options.fetch(:maintenance_message,
                                            "This site is currently under maintenance. Please check back later.")
+      @flash = ConstructionGuard::Configuration.new
     end
 
     def call(env)
       request = Rack::Request.new(env)
+
+      if request.cookies["user_data"].blank? && request.cookies["unauthorized_session"]
+        @flash.error("Failed to authenticate the user.")
+      end
+
       if under_construction? && (request.get? && request.path == "/") && request.cookies["unlocked"].nil?
         # Show the "under construction" page if the user is not unlocked
-        return [200, {"Content-Type" => "text/html"}, [under_construction_response]]
+        return [200, {"Content-Type" => "text/html"}, [under_construction_response(@flash.get(:error))]]
       end
 
       @app.call(env)
@@ -53,6 +59,12 @@ module ConstructionGuard
                                   value: "true",
                                   expires: Time.now + (7 * 24 * 60 * 60), # Set to expire after 1 week
                                   path: "/" # Set the appropriate path
+                                })
+          else
+            response.set_cookie("unauthorized_session", {
+                                  value: "true",
+                                  expires: Time.now + 30,
+                                  path: "/"
                                 })
           end
         else
@@ -117,10 +129,10 @@ module ConstructionGuard
       under_construction
     end
 
-    def under_construction_response
+    def under_construction_response(flash)
       # The HTML content for the "Under Construction" page.
       # You can customize this page as you like.
-      ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message)
+      ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message, login_message: flash)
     end
 
     def emails
