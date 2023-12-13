@@ -21,7 +21,7 @@ module ConstructionGuard
         @flash.error("Failed to authenticate the user.")
       end
 
-      if under_construction? && (request.get? && request.path == "/") && request.cookies["unlocked"].nil?
+      if under_construction && (request.get? && request.path == "/") && request.cookies["unlocked"].nil?
         # Show the "under construction" page if the user is not unlocked
         return [200, {"Content-Type" => "text/html"}, [under_construction_response(@flash.get(:error))]]
       end
@@ -124,10 +124,6 @@ module ConstructionGuard
     end
 
     private
-
-    def under_construction?
-      under_construction
-    end
 
     def under_construction_response(flash)
       # The HTML content for the "Under Construction" page.
