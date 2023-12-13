@@ -128,21 +128,8 @@ module ConstructionGuard
     def under_construction_response(flash)
       # The HTML content for the "Under Construction" page.
       # You can customize this page as you like.
-      ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message, login_message: flash)
-    end
-
-    def emails
-      # Access the configuration file from the Rails application
-      config_file = Rails.root.join("config", "underconstruction_guard.yml")
-      config_data = YAML.load_file(config_file) if File.exist?(config_file)
-
-      # Retrieve the 'emails' key from the config data
-      config_data["emails"] || []
-    end
-
-    def email_matched?(email_to_check)
-      allowed_emails = emails
-      allowed_emails.include?(email_to_check)
+      ConstructionGuard::Renderer.render_template(:default_template, message: maintenance_message,
+                                                                     login_message: flash)
     end
   end
 end
