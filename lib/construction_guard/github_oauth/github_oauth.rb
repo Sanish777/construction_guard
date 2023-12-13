@@ -34,7 +34,7 @@ module ConstructionGuard::GithubOauth
         http.send_request("GET", uri.path, body, headers)
       end
 
-      parsed_response = ConstructionGuard.parse_response(response)
+      parsed_response = ConstructionGuard::Middleware.parse_response(response)
       p parsed_response
       p "You are #{parsed_response['email']}"
       parsed_response
