@@ -2,104 +2,137 @@
 <html>
   <head>
     <title>Under Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-      /* Reset some default styles */
-      body {
+      *,
+      *:before,
+      *:after{
+        box-sizing: border-box;
         margin: 0;
         padding: 0;
+      }
+      body{
+        background-color: #080710;
+      }
+      .background{
+        height: 520px;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 430px;
+      }
+      .background .shape{
+        border-radius: 50%;
+        height: 200px;
+        position: absolute;
+        width: 200px;
+      }
+      .shape:first-child{
+        background: linear-gradient(#1845ad, #23a2f6);
+        left: -126px;
+        top: 325px;
+      }
+      .shape:last-child{
+        background: linear-gradient(to right, #ff512f, #f09819);
+        bottom: 272px;
+        height: 250px;
+        right: -114px;
+        width: 250px;
+      }
+      form{
+        backdrop-filter: blur(10px);
+        background-color: rgba(255,255,255,0.13);
+        border-radius: 30px;
+        border: 2px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 40px rgba(8,7,16,0.6);
+        height: fit-content;
+        left: 50%;
+        padding: 40px 20px 30px;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 440px;
+      }
+      form *{
+        border: none;
+        color: #ffffff;
+        font-family: 'Poppins',sans-serif;
+        letter-spacing: 0.5px;
+        outline: none;
+      }
+      form h3{
+        font-size: 32px;
+        font-weight: 600;
+        line-height: 42px;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      h3 span{
+        font-weight: 100;
+      }
+      .message {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .social{
+        margin-top: 50px;
+        display: flex;
+      }
+      .social a{
+        background-color: rgba(255,255,255,0.27);
+        border-radius: 20px;
+        color: #eaf0fb;
+        padding: 8px 14px;
+        text-align: center;
+        text-decoration: none;
+        width: 100%;
+      }
+      .social a:hover{
+        background-color: rgba(255,255,255,0.47);
+      }
+      .social .fb{
+        margin-left: 25px;
+      }
+      .social i{
+        font-size: 45px;
+        margin-right: 20px;
+      }
+      .social span {
+        font-size: 19px;
+        font-weight: 600;
+      }
+      .go {
+        align-items: center;
         display: flex;
         justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-         background-image: url('https://wallpapers.com/images/high/4k-laptop-stormy-night-on-bed-4eijg1x3ca6fdhlq.jpg');
-        font-family: Arial, sans-serif;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
-        font-family: Arial, sans-serif;
-        font-family: Arial, sans-serif;
       }
-
-      /* Glass login form container */
-      .glass-container {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.25) 25%,
-          rgba(255, 255, 255, 0.1) 50%,
-          rgba(255, 255, 255, 0.25) 75%
-        );
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        max-width: 400px;
-        width: 90%;
-        animation: fadeInDown 0.5s ease;
-      }
-
-      /* Form styles */
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      label {
-        font-weight: bold;
-        color: #333;
-      }
-
-      input {
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        outline: none;
-        font-size: 16px;
-        font-family: inherit;
-      }
-
-      input[type="submit"] {
-        cursor: pointer;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        padding: 12px;
-        font-weight: bold;
-        font-size: 16px;
-        transition: background-color 0.2s ease;
-      }
-
-      input[type="submit"]:hover {
-        background-color: #0056b3;
-      }
-
-      /* Optional animation */
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .error {
+        color: red;
+        font-weight: 500;
+        margin-top: 25px;
+        text-align: center;
+        font-size: 18px;
       }
     </style>
   </head>
   <body>
-    <div class="glass-container">
-      <h1 style="text-align: center; margin-bottom: 20px;">Under Construction</h1>
-      <p style="text-align: center;"><%= message %></p>
-      <p class="error"><%= login_message%></p>
-      <form action="/unlock" method="post">
-        <label for="password">Unlock Password:</label>
-        <input type="password" id="password" name="unlock_password" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <input type="submit" value="Unlock">
-      </form>
-      <a href="https://github.com/login/oauth/authorize?client_id=<%= ENV["CLIENT_ID"] %>" target="_top">sign </a>
+    <div class="background">
+      <div class="shape"></div>
+      <div class="shape"></div>
     </div>
+    <form>
+      <h3><span>Under</span> Construction</h3>
+      <div class="message">
+        <%= message %>
+      </div>
+      <div class="social">
+        <a class="go" href="https://github.com/login/oauth/authorize?client_id=<%= ENV["CLIENT_ID"] %>" target="_top"><i class="fa fa-github"></i><span>Authenticate with Github</span></a>
+      </div>
+      <div class="error-message">
+        <p class="error"><%= login_message %></p>
+      </div>
+    </form>
   </body>
 </html>
