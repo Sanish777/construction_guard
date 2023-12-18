@@ -26,16 +26,16 @@ module ConstructionGuard
         return [200, {"Content-Type" => "text/html"}, [under_construction_response(@flash.get(:error))]]
       end
 
-
       if under_construction && request.cookies["unlocked"].present?
         decrypted_access_token = ConstructionGuard::EncryptDecrypt.decrypt(request.cookies["auth_token"] || "",
-                                                                                  TOP_SECRET_KEY)
+                                                                           TOP_SECRET_KEY)
         is_member = ConstructionGuard::GithubOauth.retrieve_organization_membership(
           request.cookies["user_data"], decrypted_access_token
         )
         if is_member.code.to_i != 204
           return [200, {"Content-Type" => "text/html"}, [under_construction_response(@flash.get(:error))]]
         end
+
         @app.call(env)
       end
 
