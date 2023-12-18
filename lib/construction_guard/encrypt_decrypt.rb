@@ -42,6 +42,12 @@ module ConstructionGuard
       rescue StandardError => e
         ""
       end
+
+      def secret_key_32_bytes(secret_key)
+        sha256 = OpenSSL::Digest.new("SHA256")
+        hash = OpenSSL::HMAC.digest(sha256, "secret_key", secret_key)
+        hash[0, 32]
+      end
     end
   end
 end
