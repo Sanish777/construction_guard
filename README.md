@@ -23,7 +23,7 @@ NOTE: the redirect url must be the '/constructionguard/github/callback'
 ```ruby
 # config/routes.rb
 
-get '/constructionguard/github/callback', to: 'construction_guard#github'
+get '/constructionguard/github/callback', to: 'construction_guards#github'
 
 ```
 Create construction_guards_controller.rb file and add the following method to it.
