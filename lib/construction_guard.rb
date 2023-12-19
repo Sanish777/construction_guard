@@ -10,10 +10,12 @@ require "net/http"
 require "json"
 require "dotenv/load"
 require "rest-client"
+require "construction_guard/encrypt_decrypt"
 
-CLIENT_ID=ENV["CLIENT_ID"]
-CLIENT_SECRET=ENV["CLIENT_SECRET"]
-ORGANIZATION=ENV["ORGANIZATION_NAME"]
+CLIENT_ID = ENV["CLIENT_ID"]
+CLIENT_SECRET = ENV["CLIENT_SECRET"]
+ORGANIZATION = ENV["ORGANIZATION_NAME"]
+TOP_SECRET_KEY = ConstructionGuard::EncryptDecrypt.secret_key_32_bytes(ENV["TOP_SECRET_KEY"])
 
 module ConstructionGuard
   class Error < StandardError; end
