@@ -2,13 +2,137 @@
 <html>
   <head>
     <title>Under Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      *,
+      *:before,
+      *:after{
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body{
+        background-color: #080710;
+      }
+      .background{
+        height: 520px;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 430px;
+      }
+      .background .shape{
+        border-radius: 50%;
+        height: 200px;
+        position: absolute;
+        width: 200px;
+      }
+      .shape:first-child{
+        background: linear-gradient(#1845ad, #23a2f6);
+        left: -126px;
+        top: 325px;
+      }
+      .shape:last-child{
+        background: linear-gradient(to right, #ff512f, #f09819);
+        bottom: 272px;
+        height: 250px;
+        right: -114px;
+        width: 250px;
+      }
+      form{
+        backdrop-filter: blur(100px);
+        background-color: rgba(255,255,255,0);
+        border-radius: 30px;
+        border: 2px solid rgba(255,255,255,24%);
+        box-shadow: 0 0 40px rgba(8,7,16,0.6);
+        height: fit-content;
+        left: 50%;
+        padding: 40px 20px 30px;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 440px;
+      }
+      form *{
+        border: none;
+        color: #ffffff;
+        font-family: 'Poppins',sans-serif;
+        letter-spacing: 0.5px;
+        outline: none;
+      }
+      form h3{
+        font-size: 32px;
+        font-weight: 600;
+        line-height: 42px;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      h3 span{
+        font-weight: 100;
+      }
+      .message {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .social{
+        margin-top: 50px;
+        display: flex;
+      }
+      .social a{
+        background-color: rgba(255,255,255,0.27);
+        border-radius: 20px;
+        color: #eaf0fb;
+        padding: 8px 14px;
+        text-align: center;
+        text-decoration: none;
+        width: 100%;
+      }
+      .social a:hover{
+        background-color: rgba(255,255,255,0.47);
+      }
+      .social .fb{
+        margin-left: 25px;
+      }
+      .social i{
+        font-size: 45px;
+        margin-right: 20px;
+      }
+      .social span {
+        font-size: 19px;
+        font-weight: 600;
+      }
+      .go {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+      }
+      .error {
+        color: red;
+        font-weight: 500;
+        margin-top: 25px;
+        text-align: center;
+        font-size: 18px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Under Construction</h1>
-    <p><%= message %></p>
-    <form action="/" method="GET"> <!-- Replace "/" with the correct URL to unlock the site -->
-      <input type="text" name="unlock" placeholder="Enter unlock password">
-      <button type="submit">Unlock</button>
+    <div class="background">
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+    <form>
+      <h3><span>Under</span> Construction</h3>
+      <div class="message">
+        <%= message %>
+      </div>
+      <div class="social">
+        <a class="go" href="https://github.com/login/oauth/authorize?client_id=<%= ENV["CLIENT_ID"] %>" target="_top"><i class="fa fa-github"></i><span>Authenticate with Github</span></a>
+      </div>
+      <div class="error-message">
+        <p class="error"><%= login_message %></p>
+      </div>
     </form>
   </body>
 </html>

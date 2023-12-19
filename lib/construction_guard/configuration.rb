@@ -1,11 +1,24 @@
 module ConstructionGuard
   class Configuration
-    attr_accessor :under_construction, :maintenance_message
-
     def initialize
-      @under_construction = options.fetch(:under_construction, false)
-      @maintenance_message = options.fetch(:maintenance_message,
-                                           "This site is currently under maintenance. Please check back later.")
+      @messages = {}
+    end
+
+    def set(key, value)
+      @messages[key] = value
+    end
+
+    def success(message)
+      set(:success, message)
+    end
+
+    def error(message)
+      set(:error, message)
+    end
+
+    def get(key)
+      @messages[key]
+      @messages.delete(key)
     end
   end
 end

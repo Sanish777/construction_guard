@@ -1,37 +1,75 @@
 # ConstructionGuard
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/construction_guard`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Welcome to Construction Guard!
+It was written for the purpose of protecting the unpublished sites from the unauthorized users.
+It allows specific Github organization's member to authenticate the website through Github OmniAuth.
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+Install the gem by adding the following to the application's Gemfile:
 
-    $ bundle add construction_guard
+    gem 'construction_guard', git: 'https://github.com/Sanish777/construction_guard'
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Install the gem by executing following command:
 
-    $ gem install construction_guard
+    $ bundle install
 
 ## Usage
 
-TODO: Write usage instructions here
+### 1. Application Setup
+Add the route for the construction guard in the routes file.
 
-## Development
+NOTE: the redirect url must be the '/constructionguard/github/callback'
+```ruby
+# config/routes.rb
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+get '/constructionguard/github/callback', to: 'construction_guard#github'
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```
+Create construction_guards_controller.rb file and add the following method to it.
 
-## Contributing
+```ruby
+# app/controllers/construction_guards_controller.rb
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/construction_guard. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/construction_guard/blob/master/CODE_OF_CONDUCT.md).
+class ConstructionGuardsController < ApplicationController
+	def github
+		code = params[:code]
+		ConstructionGuard::Middleware.setup_omniauth(request.env, response, code)
+		redirect_to root_path
+	end
+end
+```
 
-## License
+Create construction_guard.rb inside the initializers directory.
+You can configure the `under_construction` flag and `maintenance_message` in this file.
+```ruby
+# config/initializers/construction_guard.rb
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+require 'construction_guard/middleware'
 
-## Code of Conduct
+Rails.application.config.middleware.use ConstructionGuard::Middleware, under_construction: true, maintenance_message: "This Site is currently Under Construction"
+```
 
-Everyone interacting in the ConstructionGuard project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/construction_guard/blob/master/CODE_OF_CONDUCT.md).
+### 1.1. ENV Configuration
+```env
+CLIENT_ID="Your Client ID from github"
+CLIENT_SECRET="Your Client Secret github"
+TOP_SECRET_KEY="Your Secret Key"
+ORGANIZATION_NAME="Your Organization Name from github"
+```
+
+NOTE: `TOP_SECRET_KEY` can be random set of string.
+
+### 2. OAUTH App Setup
+1. [Create a OAuth App](https://github.com/settings/applications/new) from the developers Settings.
+2. Add the required Application Information.
+3. Authorization callback URL must be `{url}/constructionguard/github/callback`
+4. Leave the `Enable Device Flow` unchecked.
+5. You will get the `Client ID` and `Client Secrets` after successful creation.
+
+### 3. Organization Setup
+
+1. The user must [create an organization](https://github.com/account/organizations/new?plan=free&ref_cta=Create%2520a%2520free%2520organization&ref_loc=cards&ref_page=%2Forganizations%2Fplan) on the github.
+2. Add the members to the organizations with the github usernames or emails.
+3. After the creating the organizations, we must verify whether the members are private or public.
+3. The members must be public for successful user authentication.
