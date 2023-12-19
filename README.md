@@ -2,6 +2,7 @@
 
 Welcome to Construction Guard!
 It was written for the purpose of protecting the unpublished sites from the unauthorized users.
+It allows specific Github organization's member to authenticate the website through Github OmniAuth.
 
 ## Installation
 
@@ -25,12 +26,12 @@ NOTE: the redirect url must be the '/constructionguard/github/callback'
 get '/constructionguard/github/callback', to: 'construction_guard#github'
 
 ```
-Create construction_guard_controller.rb file and add the following method to it.
+Create construction_guards_controller.rb file and add the following method to it.
 
 ```ruby
-# app/controllers/construction_guard.rb
+# app/controllers/construction_guards_controller.rb
 
-class ConstructionGuard < ApplicationController
+class ConstructionGuardsController < ApplicationController
 	def github
 		code = params[:code]
 		ConstructionGuard::Middleware.setup_omniauth(request.env, response, code)
@@ -49,17 +50,17 @@ require 'construction_guard/middleware'
 Rails.application.config.middleware.use ConstructionGuard::Middleware, under_construction: true, maintenance_message: "This Site is currently Under Construction"
 ```
 
-### ENV Configuration
+### 1.1. ENV Configuration
 ```env
-CLIENT_ID="Your Client ID"
-CLIENT_SECRET="Your Client Secret"
+CLIENT_ID="Your Client ID from github"
+CLIENT_SECRET="Your Client Secret github"
 TOP_SECRET_KEY="Your Secret Key"
-ORGANIZATION_NAME="Your Organization Name"
+ORGANIZATION_NAME="Your Organization Name from github"
 ```
 
 NOTE: `TOP_SECRET_KEY` can be random set of string.
 
-### OAUTH APP SETUP
+### 2. OAUTH App Setup
 1. [Create a OAuth App](https://github.com/settings/applications/new) from the developers Settings.
 2. Add the required Application Information.
 3. Authorization callback URL must be `{url}/constructionguard/github/callback`
