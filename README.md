@@ -17,15 +17,18 @@ Install the gem by executing following command:
 ## Usage
 
 ### 1. Application Setup
+
 Add the route for the construction guard in the routes file.
 
 NOTE: the redirect url must be the '/constructionguard/github/callback'
+
 ```ruby
 # config/routes.rb
 
 get '/constructionguard/github/callback', to: 'construction_guards#github'
 
 ```
+
 Create construction_guards_controller.rb file and add the following method to it.
 
 ```ruby
@@ -42,6 +45,7 @@ end
 
 Create construction_guard.rb inside the initializers directory.
 You can configure the `under_construction` flag and `maintenance_message` in this file.
+
 ```ruby
 # config/initializers/construction_guard.rb
 
@@ -51,6 +55,7 @@ Rails.application.config.middleware.use ConstructionGuard::Middleware, under_con
 ```
 
 ### 1.1. ENV Configuration
+
 ```env
 CLIENT_ID="Your Client ID from github"
 CLIENT_SECRET="Your Client Secret github"
@@ -61,6 +66,7 @@ ORGANIZATION_NAME="Your Organization Name from github"
 NOTE: `TOP_SECRET_KEY` can be random set of string.
 
 ### 2. OAUTH App Setup
+
 1. [Create a OAuth App](https://github.com/settings/applications/new) from the developers Settings.
 2. Add the required Application Information.
 3. Authorization callback URL must be `{url}/constructionguard/github/callback`
@@ -72,4 +78,4 @@ NOTE: `TOP_SECRET_KEY` can be random set of string.
 1. The user must [create an organization](https://github.com/account/organizations/new?plan=free&ref_cta=Create%2520a%2520free%2520organization&ref_loc=cards&ref_page=%2Forganizations%2Fplan) on the github.
 2. Add the members to the organizations with the github usernames or emails.
 3. After the creating the organizations, we must verify whether the members are private or public.
-3. The members must be public for successful user authentication.
+4. The members must be public for successful user authentication.
